@@ -1,11 +1,18 @@
-export const isAuthenticated = () => {
-    return !!localStorage.getItem("user"); // Check if "user" exists in local storage
-};
 
-export const loginUser = (userData) => {
-    localStorage.setItem("user", JSON.stringify(userData)); // Save user data in local storage
-};
-
-export const logoutUser = () => {
-    localStorage.removeItem("user"); // Remove user from local storage
-};
+export const setUser = (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+  };
+  
+  export const getUser = () => {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  };
+  
+  export const clearUser = () => {
+    localStorage.removeItem("user");
+  };
+  
+  export const isAuthenticated = () => {
+    return !!getUser();
+  };
+  

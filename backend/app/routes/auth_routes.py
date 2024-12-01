@@ -15,6 +15,8 @@ def register():
     """Registers a new user and triggers OTP generation by calling the send_otp function."""
     data = request.get_json()
 
+    print(data)
+
     # Validate required fields
     required_fields = ['full_name', 'mobile_number', 'password', 'voter_district', 'country_code']
     missing_fields = [field for field in required_fields if field not in data]
@@ -31,22 +33,30 @@ def register():
             return jsonify({'error': 'User already exists with this mobile number'}), 400
 
         # Create a new user
+        print("gonna")
         user = User(
             unique_member_id=f"UID-{int.from_bytes(os.urandom(3), 'big')}",
-            full_name=data['full_name'],
-            mobile_number=data['mobile_number'],
-            country_code=data['country_code'],
-            password=hashed_password,
-            voter_district=data['voter_district'],
-            date_of_birth=data.get('date_of_birth'),
-            profile_picture=data.get('profile_picture'),
-            leader_id=data.get('leader_id'),
-            verified=False  # User is unverified initially
+            full_name=data['full_name'],  # Required
+            mobile_number=data['mobile_number'],  # Required
+            country_code=data['country_code'],  # Required
+            password=hashed_password,  # Required
+            voter_district=data['voter_district'],  # Required (district name)
+            voter_parliament=data.get('voter_parliament', None),  # Optional
+            voter_assembly=data.get('voter_assembly', None),  # Optional
+            voter_city=data.get('voter_city', None),  # Optional (newly added)
+            voter_mandal=data.get('voter_mandal', None),  # Optional
+            voter_ward=data.get('voter_ward', None),  # Optional
+            date_of_birth=data.get('date_of_birth', None),  # Optional
+            profile_picture=data.get('profile_picture', None),  # Optional
+            leader_id=data.get('leader_id', None),  # Optional
+            verified=False  # Not verified initially
         )
+
+        print(user)
 
         db.session.add(user)
         db.session.commit()
-
+        
         response = send_otp_internal(data['mobile_number'], data['country_code'])
 
         if response.get('error'):
@@ -120,16 +130,13 @@ def reset_password():
 
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():
-    from datetime import datetime
-
     data = request.get_json()
 
-    # Validate mobile number and OTP
+    # Validate request
     if 'mobile_number' not in data or 'otp' not in data:
         return jsonify({'error': 'Mobile number and OTP are required'}), 400
 
     try:
-        # Fetch user by mobile number
         user = User.query.filter_by(mobile_number=data['mobile_number']).first()
         if not user:
             return jsonify({'error': 'User not found'}), 404
@@ -140,13 +147,20 @@ def verify_otp():
         if user.otp_expiration < datetime.utcnow():
             return jsonify({'error': 'OTP has expired'}), 401
 
-        # OTP is valid, mark user as verified
+        # OTP is valid
         user.otp = None
         user.otp_expiration = None
-        user.verified = True
         db.session.commit()
 
-        return jsonify({'message': 'OTP verified successfully. User is now registered.'}), 200
+        if not user.verified:
+            # Registration case
+            user.verified = True
+            db.session.commit()
+            return jsonify({'message': 'OTP verified successfully. Registration complete.', 'success': True, 'is_registration': True, 'user': {'mobile_number': user.mobile_number}}), 200
+        else:
+            # Reset password case
+            return jsonify({'message': 'OTP verified successfully. Proceed to reset password.', 'success': True, 'is_registration': False}), 200
+
     except Exception as e:
         return jsonify({'error': f"OTP verification failed: {str(e)}"}), 500
 
@@ -165,7 +179,6 @@ def send_otp_internal(mobile_number, country_code):
         # Generate a random 6-digit OTP
         otp = f"{random.randint(100000, 999999)}"
         expiration_time = datetime.utcnow() + timedelta(minutes=10)
-
         # Fetch user by mobile number
         user = User.query.filter_by(mobile_number=mobile_number).first()
         if not user:
@@ -175,12 +188,10 @@ def send_otp_internal(mobile_number, country_code):
         user.otp = otp
         user.otp_expiration = expiration_time
         db.session.commit()
-
         # Initialize Twilio Client
-        print(TWILIO_ACCOUNT_SID)
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
         # Send OTP via SMS
+        
         message = client.messages.create(
             body=f"Your OTP is {otp}. It will expire in 10 minutes.",
             from_=TWILIO_PHONE_NUMBER,
@@ -192,3 +203,41 @@ def send_otp_internal(mobile_number, country_code):
         return {'message': 'OTP sent successfully'}
     except Exception as e:
         return {'error': f"Failed to send OTP: {str(e)}"}
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    """Login function to authenticate a user using mobile number and password."""
+    data = request.get_json()
+
+    # Validate required fields
+    if 'mobile_number' not in data or 'password' not in data:
+        return jsonify({'error': 'Mobile number and password are required'}), 400
+
+    try:
+        # Fetch user by mobile number
+        user = User.query.filter_by(mobile_number=data['mobile_number']).first()
+
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Verify password using bcrypt
+        if not bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
+            return jsonify({'error': 'Invalid password'}), 401
+
+        # Ensure user is verified
+        if not user.verified:
+            return jsonify({'error': 'User is not verified. Please verify OTP first.'}), 403
+
+        # Return user details on successful login
+        return jsonify({
+            'message': 'Login successful!',
+            'user': {
+                'id': user.id,
+                'full_name': user.full_name,
+                'mobile_number': user.mobile_number,
+                'voter_district': user.voter_district
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': f"Login failed: {str(e)}"}), 500

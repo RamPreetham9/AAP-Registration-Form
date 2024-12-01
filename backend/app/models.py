@@ -5,18 +5,27 @@ class User(db.Model):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    unique_member_id = db.Column(db.String(50), unique=True, nullable=False)
-    full_name = db.Column(db.String(100), nullable=False)
-    mobile_number = db.Column(db.String(15), unique=True, nullable=False)
-    country_code = db.Column(db.String(5), nullable=True)
-    password = db.Column(db.String(255), nullable=False)
-    voter_district = db.Column(db.String(100), nullable=True)
-    date_of_birth = db.Column(db.Date, nullable=True)
-    profile_picture = db.Column(db.String(255), nullable=True)
+    unique_member_id = db.Column(db.String(50), unique=True, nullable=False)  # Unique member ID
+    full_name = db.Column(db.String(100), nullable=False)  # User's full name
+    mobile_number = db.Column(db.String(15), unique=True, nullable=False)  # Mobile number
+    country_code = db.Column(db.String(5), nullable=True)  # Country code for mobile number
+    password = db.Column(db.String(255), nullable=False)  # Hashed password
+    voter_district = db.Column(db.String(100), nullable=True)  # District name
+    voter_parliament = db.Column(db.String(100), nullable=True)  # Parliament constituency name (optional)
+    voter_assembly = db.Column(db.String(100), nullable=True)  # Assembly constituency name (optional)
+    voter_city = db.Column(db.String(100), nullable=True)  # City name (optional)
+    voter_mandal = db.Column(db.String(100), nullable=True)  # Mandal name (optional)
+    voter_ward = db.Column(db.String(50), nullable=True)  # Ward number (optional, as text)
+    date_of_birth = db.Column(db.Date, nullable=True)  # User's date of birth (optional)
+    profile_picture = db.Column(db.String(255), nullable=True)  # URL or path to profile picture (optional)
     leader_id = db.Column(db.Integer, nullable=True)  # Optional field for leader assignment
-    otp = db.Column(db.String(6), nullable=True)
-    otp_expiration = db.Column(db.DateTime, nullable=True)
+    otp = db.Column(db.String(6), nullable=True)  # OTP for verification
+    otp_expiration = db.Column(db.DateTime, nullable=True)  # OTP expiration timestamp
     verified = db.Column(db.Boolean, default=False)  # To track if the user is verified
+    
+    def __repr__(self):
+        return f"<User {self.full_name}>"
+
 
 # District Model
 class District(db.Model):

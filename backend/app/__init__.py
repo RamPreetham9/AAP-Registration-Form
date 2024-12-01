@@ -48,7 +48,7 @@ def create_app():
     from .routes.election_routes import election_bp
     from .routes.admin_routes import admin_bp
     from .routes.leader_routes import leader_bp
-    from .routes.districts import districts_bp
+    from .routes.lists import lists_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
@@ -56,6 +56,6 @@ def create_app():
     app.register_blueprint(election_bp, url_prefix='/api/election')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(leader_bp, url_prefix='/api/leader')
-    app.register_blueprint(districts_bp, url_prefix='/api/districts')
+    app.register_blueprint(lists_bp, url_prefix='/api/lists')
     
     return app

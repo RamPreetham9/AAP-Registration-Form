@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 # from werkzeug.security import generate_password_hash
 from twilio.rest import Client  # Twilio library
 from ..models import User, db
+from dotenv import load_dotenv
 import os
 import bcrypt
 from datetime import datetime, timedelta
@@ -136,9 +137,16 @@ def verify_otp():
         return jsonify({'error': f"OTP verification failed: {str(e)}"}), 500
 
 
+# Load environment variables
+load_dotenv()
+
+# Twilio credentials from .env file
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 
 def send_otp_internal(mobile_number, country_code):
-    """Internal function to generate and send OTP."""
+    """Internal function to generate and send OTP using Twilio."""
     try:
         # Generate a random 6-digit OTP
         otp = f"{random.randint(100000, 999999)}"
@@ -149,14 +157,24 @@ def send_otp_internal(mobile_number, country_code):
         if not user:
             return {'error': 'User not found'}
 
-        # Update OTP and expiration
+        # Update OTP and expiration in the database
         user.otp = otp
         user.otp_expiration = expiration_time
         db.session.commit()
 
-        # Simulate sending OTP (you can replace this with an SMS gateway)
-        print(f"Sending OTP {otp} to {country_code}{mobile_number}")
+        # Initialize Twilio Client
+        print(TWILIO_ACCOUNT_SID)
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+        # Send OTP via SMS
+        message = client.messages.create(
+            body=f"Your OTP is {otp}. It will expire in 10 minutes.",
+            from_=TWILIO_PHONE_NUMBER,
+            to=f"{country_code}{mobile_number}"
+        )
+
+        print(f"OTP sent: {message.sid}")  # Log the message SID for debugging
 
         return {'message': 'OTP sent successfully'}
     except Exception as e:
-        return {'error': str(e)}
+        return {'error': f"Failed to send OTP: {str(e)}"}

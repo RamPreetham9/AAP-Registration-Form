@@ -94,39 +94,27 @@ def request_reset_password():
 # patch request will be called if otp is verified
 @auth_bp.route('/reset-password', methods=['PATCH'])
 def reset_password():
-    """Reset the password with OTP verification."""
     data = request.get_json()
 
-    # Validate required fields
-    required_fields = ['mobile_number', 'otp', 'new_password']
-    missing_fields = [field for field in required_fields if field not in data]
-    if missing_fields:
-        return jsonify({'error': f"Missing required fields: {', '.join(missing_fields)}"}), 400
+    # Validate mobile number and new password
+    if 'mobile_number' not in data or 'new_password' not in data:
+        return jsonify({'error': 'Mobile number and new password are required'}), 400
 
     try:
-        # Fetch the user by mobile number
+        # Fetch user by mobile number
         user = User.query.filter_by(mobile_number=data['mobile_number']).first()
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        # Validate OTP
-        if user.otp != data['otp']:
-            return jsonify({'error': 'Invalid OTP'}), 401
-        if user.otp_expiration < datetime.utcnow():
-            return jsonify({'error': 'OTP has expired'}), 401
-
-        # Hash the new password
+        # Update password
         hashed_password = bcrypt.hashpw(data['new_password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-        # Update the user's password and clear OTP fields
         user.password = hashed_password
-        user.otp = None
-        user.otp_expiration = None
         db.session.commit()
 
-        return jsonify({'message': 'Password reset successfully'}), 200
+        return jsonify({'message': 'Password reset successfully!'}), 200
     except Exception as e:
-        return jsonify({'error': f"Failed to reset password: {str(e)}"}), 500
+        return jsonify({'error': f"Password reset failed: {str(e)}"}), 500
+
 
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():
@@ -163,6 +151,45 @@ def verify_otp():
 
     except Exception as e:
         return jsonify({'error': f"OTP verification failed: {str(e)}"}), 500
+
+@auth_bp.route('/send-otp', methods=['POST'])
+def send_otp():
+    """API endpoint to generate and send OTP for user actions."""
+    data = request.get_json()
+
+    # Validate required fields
+    if 'mobile_number' not in data or 'country_code' not in data:
+        return jsonify({'error': 'Mobile number and country code are required'}), 400
+
+    try:
+        # Fetch the user by mobile number
+        user = User.query.filter_by(mobile_number=data['mobile_number']).first()
+
+        if 'mode' not in data or data['mode'] == "Register":
+            # Registration mode: Ensure user does not already exist
+            if user:
+                return jsonify({'error': 'User already exists. Cannot resend OTP for registration.'}), 400
+            # Create a new user if not found
+            user = User(
+                mobile_number=data['mobile_number'],
+                country_code=data['country_code'],
+                verified=False  # Not verified initially
+            )
+            db.session.add(user)
+            db.session.commit()
+        elif data['mode'] == "ResetPass":
+            # Password reset mode: Ensure user exists
+            if not user:
+                return jsonify({'error': 'User not found. Cannot send OTP for password reset.'}), 404
+
+        # Send OTP
+        response = send_otp_internal(data['mobile_number'], data['country_code'])
+        if response.get('error'):
+            return jsonify({'error': response['error']}), 500
+
+        return jsonify({'message': 'OTP sent successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': f"Failed to send OTP: {str(e)}"}), 500
 
 
 # Load environment variables

@@ -4,6 +4,7 @@ import VerifyOtp from "./components/Auth/VerifyOtp";
 import Login from "./components/Auth/Login";
 import Home from "./components/Home";
 
+
 function App() {
   return (
     <Router>

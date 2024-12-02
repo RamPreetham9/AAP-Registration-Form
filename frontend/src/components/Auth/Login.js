@@ -57,11 +57,11 @@ const Login = () => {
         />
         <button type="submit">Login</button>
       </form>
-      <p>
+      {/* <p>
         <button onClick={() => navigate("/reset-password")} className="link-button">
           Forgot Password?
         </button>
-      </p>
+      </p> */}
       <p>
         <span>New user? </span>
         <button onClick={() => navigate("/register")} className="link-button">

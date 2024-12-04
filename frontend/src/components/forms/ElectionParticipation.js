@@ -18,9 +18,9 @@ const ElectionParticipation = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/lists/election-participation", {
-        user_id: JSON.parse(localStorage.getItem("user")).id, // Assuming user is stored in localStorage
-        electionType: formData.electionType,
+      const response = await axios.post("/forms/election-participation", {
+        user_id: JSON.parse(localStorage.getItem("user")).user.id,
+        interested_positions: formData.electionType,
       });
       alert(response.data.message);
     } catch (error) {

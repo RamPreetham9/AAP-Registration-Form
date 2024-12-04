@@ -29,9 +29,12 @@ const Volunteering = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/lists/volunteering", {
-        user_id: JSON.parse(localStorage.getItem("user")).id,
-        participationModes: formData.participationModes,
+      
+      const user = JSON.parse(localStorage.getItem("user"));
+      console.log(user);
+      const response = await axios.post("/forms/volunteering", {
+        user_id: user.user.id,
+        participation_methods: formData.participationModes,
         feedback: formData.feedback,
       });
       alert(response.data.message);
@@ -43,7 +46,7 @@ const Volunteering = () => {
 
   return (
     <div className="container">
-        <Header />
+      <Header />
       <h2>Volunteering Form</h2>
       <form onSubmit={handleSubmit}>
         <fieldset>

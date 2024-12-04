@@ -44,18 +44,16 @@ def create_app():
     # Register blueprints (routes)
     from .routes.auth_routes import auth_bp
     from .routes.profile_routes import profile_bp
-    from .routes.volunteer_routes import volunteer_bp
-    from .routes.election_routes import election_bp
     from .routes.admin_routes import admin_bp
     from .routes.leader_routes import leader_bp
     from .routes.lists import lists_bp
+    from .routes.forms import forms_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
-    app.register_blueprint(volunteer_bp, url_prefix='/api/volunteer')
-    app.register_blueprint(election_bp, url_prefix='/api/election')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(leader_bp, url_prefix='/api/leader')
     app.register_blueprint(lists_bp, url_prefix='/api/lists')
+    app.register_blueprint(forms_bp, url_prefix='/api/forms')
     
     return app

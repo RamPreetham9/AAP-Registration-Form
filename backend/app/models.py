@@ -88,3 +88,23 @@ class Ward(db.Model):
 
     def __repr__(self):
         return f"<Ward {self.municipality_name} ({self.number_of_wards} wards)>"
+    
+
+from . import db
+
+class Volunteering(db.Model):
+    __tablename__ = 'volunteering'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    participation_methods = db.Column(db.String(255), nullable=False)  # Comma-separated
+    likes_about_party = db.Column(db.Text, nullable=True)  # Optional
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+class ElectionParticipation(db.Model):
+    __tablename__ = 'election_participation'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    interested_positions = db.Column(db.String(255), nullable=False)  # Comma-separated
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())

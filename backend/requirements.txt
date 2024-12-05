@@ -4,3 +4,5 @@ flask-sqlalchemy
 pyodbc
 werkzeug
 python-dotenv
+bcrypt
+twilio

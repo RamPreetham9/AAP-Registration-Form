@@ -5,6 +5,7 @@ import Login from "./components/Auth/Login";
 import Home from "./components/Home";
 import ElectionParticipation from "./components/forms/ElectionParticipation";
 import Volunteering from "./components/forms/Volunteering";
+import Complaints from "./components/forms/Complaints";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/volunteering" element={<Volunteering />} />
         <Route path="/election-form" element={<ElectionParticipation />} />
+        <Route path="/complaints" element={<Complaints />} />
       </Routes>
     </Router>
   );

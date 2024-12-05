@@ -5,9 +5,8 @@ import { clearUser, getUser } from "../services/auth";
 const Header = () => {
     const navigate = useNavigate();
     const user = getUser();
-    console.log(user.user);
+    // console.log(user.user.full_name);
     
-
     const handleLogout = () => {
         clearUser();
         navigate("/login");
@@ -16,7 +15,7 @@ const Header = () => {
     return (
         <header className="header">
             <div className="header-left">
-                <h1>{user?.user.full_name || "Guest"}</h1>
+                <h1>{ user ? user.user.full_name : "Guest"}</h1>
             </div>
             <div className="header-right">
                 <button
@@ -24,6 +23,12 @@ const Header = () => {
                     onClick={() => navigate("/")}
                 >
                     Home
+                </button>
+                <button
+                    className="header-button"
+                    onClick={() => navigate("/complaints")}
+                >
+                    Complain
                 </button>
                 <button
                     className="header-button"

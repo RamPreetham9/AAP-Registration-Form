@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `aapDB`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `aapDB` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-
-USE `aapDB`;
-
---
 -- Table structure for table `assemblies`
 --
 
@@ -101,6 +93,33 @@ INSERT INTO `districts` VALUES (1,'Alluri Sitharama Raju'),(2,'Anakapalli'),(3,'
 UNLOCK TABLES;
 
 --
+-- Table structure for table `election_participation`
+--
+
+DROP TABLE IF EXISTS `election_participation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `election_participation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `interested_positions` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `election_participation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `election_participation`
+--
+
+LOCK TABLES `election_participation` WRITE;
+/*!40000 ALTER TABLE `election_participation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `election_participation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `mandals`
 --
 
@@ -165,18 +184,21 @@ CREATE TABLE `users` (
   `country_code` varchar(5) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `voter_district` varchar(100) DEFAULT NULL,
+  `voter_parliament` varchar(100) DEFAULT NULL,
+  `voter_assembly` varchar(100) DEFAULT NULL,
+  `voter_city` varchar(100) DEFAULT NULL,
+  `voter_mandal` varchar(100) DEFAULT NULL,
+  `voter_ward` varchar(50) DEFAULT NULL,
   `date_of_birth` date DEFAULT NULL,
   `profile_picture` varchar(255) DEFAULT NULL,
   `leader_id` int DEFAULT NULL,
   `otp` varchar(6) DEFAULT NULL,
   `otp_expiration` datetime DEFAULT NULL,
   `verified` tinyint(1) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_member_id` (`unique_member_id`),
   UNIQUE KEY `mobile_number` (`mobile_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -185,7 +207,36 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (18,'UID-75667','raj','9652066986','+91','$2b$12$hBVESVk9t9afkIEPBkNWeeI1ERBvl9zS.TXwMfw9a0cslQcLG5QFC','Alluri Sitharama Raju','','','','','','2024-12-05','',NULL,NULL,NULL,1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `volunteering`
+--
+
+DROP TABLE IF EXISTS `volunteering`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `volunteering` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `participation_methods` varchar(255) DEFAULT NULL,
+  `likes_about_party` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `volunteering_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `volunteering`
+--
+
+LOCK TABLES `volunteering` WRITE;
+/*!40000 ALTER TABLE `volunteering` DISABLE KEYS */;
+/*!40000 ALTER TABLE `volunteering` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -197,4 +248,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-01 11:19:45
+-- Dump completed on 2024-12-04 19:03:45

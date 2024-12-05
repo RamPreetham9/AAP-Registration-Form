@@ -108,3 +108,14 @@ class ElectionParticipation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     interested_positions = db.Column(db.String(255), nullable=False)  # Comma-separated
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+class Complaint(db.Model):
+    __tablename__ = 'complaints'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, nullable=False)  # To link the complaint to a user
+    district = db.Column(db.String(100), nullable=False)
+    municipality = db.Column(db.String(100), nullable=False)
+    complaint_text = db.Column(db.Text, nullable=False)
+    photo_url = db.Column(db.String(255), nullable=True)  # Path to uploaded photo
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())

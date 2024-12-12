@@ -38,7 +38,7 @@ const VerifyOtp = () => {
 
         // Redirect based on registration or reset password case
         if (response.data.is_registration) {
-          navigate("/"); // Home page for new registrations
+          navigate("/complete-registration"); // Home page for new registrations
         }
       } else {
         setError("Verification failed. Please try again.");

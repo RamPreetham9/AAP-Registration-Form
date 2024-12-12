@@ -144,7 +144,7 @@ const Register = () => {
             setFormData({ ...formData, profile_picture: e.target.files[0] })
           }
         />
-        <select
+        {/* <select
           name="voter_district"
           onChange={handleChange}
           required
@@ -210,14 +210,14 @@ const Register = () => {
           name="voter_ward"
           placeholder="Voter Ward No"
           onChange={handleChange}
-        />
+        /> */}
         <input
           type="text"
           name="mobile_number"
           placeholder="Mobile Number"
           onChange={handleChange}
           required
-        />
+        /> 
         <input
           type="text"
           name="country_code"

@@ -5,7 +5,7 @@ import { clearUser, getUser } from "../services/auth";
 const Header = () => {
     const navigate = useNavigate();
     const user = getUser();
-    // console.log(user.user.full_name);
+    console.log(user.user);
     
     const handleLogout = () => {
         clearUser();

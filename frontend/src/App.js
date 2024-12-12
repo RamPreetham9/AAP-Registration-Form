@@ -6,7 +6,7 @@ import Home from "./components/Home";
 import ElectionParticipation from "./components/forms/ElectionParticipation";
 import Volunteering from "./components/forms/Volunteering";
 import Complaints from "./components/forms/Complaints";
-
+import Wizard from "./components/Auth/Wizard"
 
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
         <Route path="/volunteering" element={<Volunteering />} />
         <Route path="/election-form" element={<ElectionParticipation />} />
         <Route path="/complaints" element={<Complaints />} />
+        <Route path="/complete-registration" element={<Wizard />} />
       </Routes>
     </Router>
   );

@@ -19,7 +19,7 @@ const Home = () => {
     <div className="home-container">
       <Header /> {/* Render the Header component */}
       <div className="content">
-        <h1>Welcome, guest</h1>
+        <h1>Welcome, {user.user.full_name}</h1>
         <div className="actions">
         </div>
       </div>

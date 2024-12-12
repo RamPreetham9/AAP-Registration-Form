@@ -115,6 +115,26 @@ def reset_password():
     except Exception as e:
         return jsonify({'error': f"Password reset failed: {str(e)}"}), 500
 
+@auth_bp.route('/complete-registration', methods=['POST'])
+def complete_registration():
+    data = request.get_json()
+    print(data)
+    try:
+        # user = data.get(user, {})
+        p1 = data.get('p1', {})
+        p2 = data.get('p2', {})
+        p3 = data.get('p3', {})
+        user = data.get('user', {})
+        # Save data into the database
+        # print(user)
+        # print(f"Location Data: {p1}")
+        # print(f"Election Participation: {p2}")
+        # print(f"Volunteering Data: {p3}")
+
+        # Return success response
+        return jsonify({"message": "Registration completed successfully!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():
@@ -190,7 +210,6 @@ def send_otp():
         return jsonify({'message': 'OTP sent successfully'}), 200
     except Exception as e:
         return jsonify({'error': f"Failed to send OTP: {str(e)}"}), 500
-
 
 # Load environment variables
 load_dotenv()

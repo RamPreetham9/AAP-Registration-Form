@@ -105,7 +105,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log(formData);
+      // console.log(formData);
   
       // Make a POST request to register the user
       await axios.post("/auth/register", formData);
@@ -114,6 +114,7 @@ const Register = () => {
       alert("Registration successful! Check your phone for the OTP.");
       navigate("/verify-otp", { state: { mobile_number: formData.mobile_number } });
     } catch (error) {
+      console.log(error)
       setError(error.response?.data?.error || "Registration failed. Please try again.");
     }
   };

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { getUser } from "../services/auth";
+import { getUser, isAuthenticated } from "../services/auth";
 import Header from "./Header";
 
 const Home = () => {
@@ -8,8 +8,8 @@ const Home = () => {
   const user = getUser();
 
   React.useEffect(() => {
-    // console.log(user.user)
-    if (!user) {
+    
+    if (!isAuthenticated()) {
       navigate("/login");
     }
   }, [user, navigate]);
@@ -19,7 +19,7 @@ const Home = () => {
     <div className="home-container">
       <Header /> {/* Render the Header component */}
       <div className="content">
-        <h1>Welcome, {user.user.full_name}</h1>
+        <h1>Welcome, { user.full_name}</h1>
         <div className="actions">
         </div>
       </div>

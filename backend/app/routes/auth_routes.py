@@ -18,7 +18,7 @@ def register():
     print(data)
 
     # Validate required fields
-    required_fields = ['full_name', 'mobile_number', 'password', 'voter_district', 'country_code']
+    required_fields = ['full_name', 'mobile_number', 'password', 'country_code', 'date_of_birth']
     missing_fields = [field for field in required_fields if field not in data]
     if missing_fields:
         return jsonify({'error': f"Missing required fields: {', '.join(missing_fields)}"}), 400
@@ -33,36 +33,31 @@ def register():
             return jsonify({'error': 'User already exists with this mobile number'}), 400
 
         # Create a new user
-        print("gonna")
         user = User(
             unique_member_id=f"UID-{int.from_bytes(os.urandom(3), 'big')}",
             full_name=data['full_name'],  # Required
             mobile_number=data['mobile_number'],  # Required
             country_code=data['country_code'],  # Required
             password=hashed_password,  # Required
-            voter_district=data['voter_district'],  # Required (district name)
-            voter_parliament=data.get('voter_parliament', None),  # Optional
-            voter_assembly=data.get('voter_assembly', None),  # Optional
-            voter_city=data.get('voter_city', None),  # Optional (newly added)
-            voter_mandal=data.get('voter_mandal', None),  # Optional
-            voter_ward=data.get('voter_ward', None),  # Optional
             date_of_birth=data.get('date_of_birth', None),  # Optional
             profile_picture=data.get('profile_picture', None),  # Optional
             leader_id=data.get('leader_id', None),  # Optional
-            verified=False  # Not verified initially
+            verified=False,  # Not verified initially
+            isAdmin=False
         )
 
         print(user)
 
         db.session.add(user)
         db.session.commit()
-        
+
+        print("saved")
         response = send_otp_internal(data['mobile_number'], data['country_code'])
 
         if response.get('error'):
             return jsonify({'error': 'Registration successful, but OTP sending failed.', 'details': response['error']}), 500
 
-        return jsonify({'message': 'User registered successfully. OTP sent for verification.', 'user_id': user.id}), 201
+        return jsonify({'message': 'User registered successfully. OTP sent for verification.', 'user_id': user.user_id}), 201
     except Exception as e:
         return jsonify({'error': f"Registration failed: {str(e)}"}), 500
 
@@ -164,7 +159,7 @@ def verify_otp():
             # Registration case
             user.verified = True
             db.session.commit()
-            return jsonify({'message': 'OTP verified successfully. Registration complete.', 'success': True, 'is_registration': True, 'user': {'mobile_number': user.mobile_number}}), 200
+            return jsonify({'message': 'OTP verified successfully. Registration complete.', 'success': True, 'is_registration': True, 'user': {'mobile_number': user.mobile_number, 'user_id':user.user_id, 'full_name': user.full_name}}), 200
         else:
             # Reset password case
             return jsonify({'message': 'OTP verified successfully. Proceed to reset password.', 'success': True, 'is_registration': False}), 200
@@ -278,10 +273,9 @@ def login():
         return jsonify({
             'message': 'Login successful!',
             'user': {
-                'id': user.id,
+                'user_id': user.user_id,
                 'full_name': user.full_name,
                 'mobile_number': user.mobile_number,
-                'voter_district': user.voter_district
             }
         }), 200
 

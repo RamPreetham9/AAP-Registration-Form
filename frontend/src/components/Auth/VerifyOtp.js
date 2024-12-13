@@ -32,7 +32,6 @@ const VerifyOtp = () => {
         console.log(response.data);
         
         if (userData) {
-          // Store user data in localStorage for authentication
           setUser(userData);
         }
 

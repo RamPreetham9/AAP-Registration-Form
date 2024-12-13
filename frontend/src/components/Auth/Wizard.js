@@ -49,7 +49,7 @@ const Wizard = () => {
   const handleSubmit = async () => {
     const payload = {
       user: {
-        user_id: JSON.parse(localStorage.getItem("user")).user.id
+        user_id: JSON.parse(localStorage.getItem("user")).user_id
       },
       p1: {
         voter_district: formData.voter_district,

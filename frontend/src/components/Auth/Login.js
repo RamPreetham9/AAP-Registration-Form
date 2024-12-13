@@ -24,7 +24,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post("/auth/login", formData);
-      setUser(response.data);
+      setUser(response.data.user);
       navigate("/");
     } catch (error) {
       if (error.response && error.response.status === 404) {
